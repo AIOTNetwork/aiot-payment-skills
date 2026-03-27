@@ -11,6 +11,8 @@ SKILLS=(
   "aiotnetwork-payments-banking"
   "aiotnetwork-crypto-wallet"
   "aiotnetwork-blockchain-did"
+  "aiotnetwork-x402-merchant-auth"
+  "aiotnetwork-x402-merchant-payments"
 )
 
 echo "Installing ${#SKILLS[@]} AIOT Network skills..."

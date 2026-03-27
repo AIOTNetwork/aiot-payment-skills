@@ -36,6 +36,8 @@ If `AIOT_API_BASE_URL` is not set, use `https://payment-api-dev.aiotnetwork.io` 
 | Payments & Banking | `aiotnetwork-payments-banking` | top up a wallet, send money, make international remittances, or convert currencies |
 | Crypto Wallet | `aiotnetwork-crypto-wallet` | deposit cryptocurrency into their wallet or withdraw to an external address |
 | Blockchain & DID | `aiotnetwork-blockchain-did` | set up a decentralized identity, complete on-chain KYC, or manage membership tiers |
+| x402 Merchant Authentication | `aiotnetwork-x402-merchant-auth` | register as an x402 merchant, log in, manage sessions, or verify email via OTP |
+| x402 Merchant Payments | `aiotnetwork-x402-merchant-payments` | prepare, verify, or settle x402 payments, or check facilitator capabilities |
 
 ## Cross-Skill Dependencies
 
@@ -46,6 +48,7 @@ Some operations span multiple skills. Follow these dependency chains in order:
 3. **Account → Crypto**: User must be authenticated (account-auth) before depositing or withdrawing crypto (crypto-wallet).
 4. **Account → Blockchain DID**: User must be authenticated (account-auth) before creating a DID or staking (blockchain-did).
 5. **KYC → Wallet KYC → Card**: MasterPay KYC (kyc-identity) must be approved, then wallet KYC submitted, before card creation (card-management).
+6. **x402 Merchant Auth → x402 Merchant Payments**: Merchant must register (x402-merchant-auth) to obtain an API key before executing any payment operation (x402-merchant-payments).
 
 ## Agent Guidance
 
@@ -81,4 +84,10 @@ clawhub install aiotnetwork-crypto-wallet
 ```
 ```bash
 clawhub install aiotnetwork-blockchain-did
+```
+```bash
+clawhub install aiotnetwork-x402-merchant-auth
+```
+```bash
+clawhub install aiotnetwork-x402-merchant-payments
 ```
