@@ -40,26 +40,26 @@ If `AIOT_API_BASE_URL` is not set, use `https://payment-api-dev.aiotnetwork.io` 
 ### Register a Merchant
 
 1. Send OTP: POST /api/v1/x402/auth/otp/send with {email}
-2. Verify OTP: POST /api/v1/x402/auth/otp/verify with {email, code} — returns verificationToken (expires in 5 minutes)
-3. Register: POST /api/v1/x402/auth/register with {name, email, password, productName, payToAddress, verificationToken} — returns merchantAccount, tokens, and firstProduct (including apiKey shown once and proxyBaseUrl)
+2. Verify OTP: POST /api/v1/x402/auth/otp/verify with {email, code} — returns verification_token (expires in 5 minutes)
+3. Register: POST /api/v1/x402/auth/register with {name, email, password, product_name, pay_to_address, verification_token} — returns merchant_account, tokens, and first_product (including api_key shown once and proxy_base_url)
 
-Important: The API key in the registration response is shown only once — save it immediately. The payToAddress must be a valid Ethereum address (0x followed by 40 hex characters). Password must be 8-128 characters.
+Important: The API key in the registration response is shown only once — save it immediately. The pay_to_address must be a valid Ethereum address (0x followed by 40 hex characters). Password must be 8-128 characters.
 
 ### Login
 
-1. Login: POST /api/v1/x402/auth/login with {email, password} — returns merchantAccount {id, name, email, status} and tokens {accessToken, refreshToken}
-2. Use accessToken as Bearer token in Authorization header for authenticated requests
-3. When accessToken expires (1 hour), refresh: POST /api/v1/x402/auth/refresh with {refreshToken}
+1. Login: POST /api/v1/x402/auth/login with {email, password} — returns merchant_account {id, name, email, status} and tokens {access_token, refresh_token}
+2. Use access_token as Bearer token in Authorization header for authenticated requests
+3. When access_token expires (1 hour), refresh: POST /api/v1/x402/auth/refresh with {refresh_token}
 
 ## Rules
 
 - OTP is required for merchant registration — always send then verify before registering
 - Verification tokens expire after 5 minutes and can only be used once
-- Access tokens expire after 1 hour — use refreshToken to get a new one
+- Access tokens expire after 1 hour — use refresh_token to get a new one
 - Refresh tokens expire after 7 days
 - Registration creates the merchant account, first product, and API key in one atomic operation
 - The API key is returned only during registration — it cannot be retrieved again
-- payToAddress must be a valid Ethereum address (0x + 40 hex characters)
+- pay_to_address must be a valid Ethereum address (0x + 40 hex characters)
 - Password must be 8-128 characters
 - Logout invalidates all sessions for the merchant
 
@@ -75,10 +75,10 @@ Follow these instructions when executing this skill:
 - If a step fails, check the error and follow the recovery guidance below before retrying.
 
 - To register a new merchant: first call `merchant_send_otp`, then `merchant_verify_otp`, then `merchant_register` with the verification token. Never skip OTP verification.
-- Registration requires: name, email, password (8-128 chars), productName, payToAddress (0x + 40 hex), verificationToken.
-- The API key in the registration response (firstProduct.apiKey) is shown only once. Instruct the user to save it immediately. This key is needed for the x402-merchant-payments skill (X-API-Key header).
-- The proxyBaseUrl in the registration response is the base URL for x402 proxy endpoints.
-- When the access token expires, call `merchant_refresh_token` with the refresh token. Do not ask the user to log in again.
+- Registration requires: name, email, password (8-128 chars), product_name, pay_to_address (0x + 40 hex), verification_token.
+- The API key in the registration response (first_product.api_key) is shown only once. Instruct the user to save it immediately. This key is needed for the x402-merchant-payments skill (X-API-Key header).
+- The proxy_base_url in the registration response is the base URL for x402 proxy endpoints.
+- When the access token expires, call `merchant_refresh_token` with the refresh_token. Do not ask the user to log in again.
 - Logout invalidates all active sessions. The user must log in again after logout.
 - OTP send errors: COOLDOWN_ACTIVE (wait before resending), RATE_LIMIT_EXCEEDED (too many requests), EMAIL_SUPPRESSED (email cannot receive messages — use a different address).
 - Never log, store, or repeat the user's password or API key back to them.
