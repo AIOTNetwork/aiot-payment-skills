@@ -39,10 +39,10 @@ If `AIOT_API_BASE_URL` is not set, use `https://payment-api-dev.aiotnetwork.io` 
 
 Full payment flow from pre-request to settlement
 
-1. Pre-request: POST /api/v1/x402/proxy/pre-request with {user_wallet_address, payee_address, token_address, amount, chain_id} — returns signing parameters (permit2, contracts, and eip7702_auth if approval is needed)
+1. Pre-request: POST /api/v1/x402/proxy/pre-request with {user_wallet_address, payee_address, token_address, amount, order_id, path, chain_id (optional)} — returns signing parameters (permit2, contracts, and eip7702_auth if approval is needed)
 2. User signs the Permit2 witness transfer off-chain using the parameters from step 1 (zero gas for user)
-3. Verify: POST /api/v1/x402/proxy/verify with {payment: {signature, token, amount, payer, payee, nonce, deadline, valid_after, chain_id}} — returns {valid, reason}
-4. Settle: POST /api/v1/x402/proxy/settle with {payment: {signature, token, amount, payer, payee, nonce, deadline, valid_after, chain_id}, eip7702_auth (optional)} — returns {success, transaction, network, payer, reason}
+3. Verify: POST /api/v1/x402/proxy/verify with {payment: {signature, token, amount, payer, payee, nonce (string), deadline (int64), valid_after (int64, optional), chain_id (optional)}, order_id} — returns {valid, reason}
+4. Settle: POST /api/v1/x402/proxy/settle with {payment: {signature, token, amount, payer, payee, nonce (string), deadline (int64), valid_after (int64, optional), chain_id (optional)}, order_id, eip7702_auth (optional)} — returns {success, transaction, network, payer, reason}
 
 ### Check Facilitator Capabilities
 
@@ -71,9 +71,9 @@ Follow these instructions when executing this skill:
 
 - All endpoints in this skill use the X-API-Key header for authentication, not the Authorization Bearer header. The API key comes from merchant registration (x402-merchant-auth skill).
 - The x402 payment flow is: `x402_pre_request` -> user signs off-chain -> `x402_verify` -> `x402_settle`. Always call `x402_verify` before `x402_settle` to avoid wasting gas on invalid signatures.
-- Pre-request body requires: user_wallet_address, payee_address, token_address, amount (in smallest token units). Optional: chain_id.
+- Pre-request body requires: user_wallet_address, payee_address, token_address, amount (in smallest token units), order_id, path. Optional: chain_id.
 - If `x402_pre_request` returns needs_approval: true, the response includes eip7702_auth with signing parameters. The user must sign an EIP-7702 authorization, which is then passed to `x402_settle` in the eip7702_auth field for gasless Permit2 approval.
-- The verify and settle requests wrap payment details in a payment object.
+- The verify and settle requests wrap payment details in a payment object and require a top-level order_id field. In the payment object, nonce is a string, deadline and valid_after are int64 (unix timestamp).
 - Settlement can take up to 65 seconds due to blockchain confirmation. Do not timeout prematurely.
 - The facilitator pays all gas. The user only signs off-chain (zero gas cost).
 - If a merchant does not yet have an API key, redirect them to the x402-merchant-auth skill to register first.
