@@ -29,18 +29,19 @@ If `AIOT_API_BASE_URL` is not set, use `https://payment-api-dev.aiotnetwork.io` 
 ## Available Tools
 
 - `merchant_send_otp` — Send a one-time password to a merchant email address | `POST /api/v1/x402/auth/otp/send`
-- `merchant_verify_otp` — Verify an OTP code and receive a verification token (expires in 5 minutes) | `POST /api/v1/x402/auth/otp/verify`
+- `merchant_verify_otp` — Verify an OTP code and receive a verification token (expires in 15 minutes) | `POST /api/v1/x402/auth/otp/verify`
 - `merchant_register` — Register a new merchant account with first product and API key | `POST /api/v1/x402/auth/register`
 - `merchant_login` — Login with email and password, receive JWT access and refresh tokens | `POST /api/v1/x402/auth/login`
 - `merchant_refresh_token` — Refresh an expired access token using a refresh token | `POST /api/v1/x402/auth/refresh`
 - `merchant_logout` — Invalidate all sessions for the merchant account | `POST /api/v1/x402/auth/logout` | Requires auth
+- `merchant_get_me` — Get the current merchant's profile | `GET /api/v1/x402/merchants/me` | Requires auth
 
 ## Recommended Flows
 
 ### Register a Merchant
 
 1. Send OTP: POST /api/v1/x402/auth/otp/send with {email}
-2. Verify OTP: POST /api/v1/x402/auth/otp/verify with {email, code} — returns verification_token (expires in 5 minutes)
+2. Verify OTP: POST /api/v1/x402/auth/otp/verify with {email, code} — returns {verification_token, expires_in} (token expires in 15 minutes)
 3. Register: POST /api/v1/x402/auth/register with {name, email, password, product_name, pay_to_address, verification_token} — returns merchant_account, tokens, and first_product (including api_key shown once and proxy_base_url)
 
 Important: The API key in the registration response is shown only once — save it immediately. The pay_to_address must be a valid Ethereum address (0x followed by 40 hex characters). Password must be 8-128 characters.
@@ -54,7 +55,8 @@ Important: The API key in the registration response is shown only once — save 
 ## Rules
 
 - OTP is required for merchant registration — always send then verify before registering
-- Verification tokens expire after 5 minutes and can only be used once
+- Verification tokens expire after 15 minutes and can only be used once
+- All public auth routes are rate-limited (10 req/min, burst 5). Exceeding returns HTTP 429
 - Access tokens expire after 1 hour — use refresh_token to get a new one
 - Refresh tokens expire after 7 days
 - Registration creates the merchant account, first product, and API key in one atomic operation
@@ -81,4 +83,6 @@ Follow these instructions when executing this skill:
 - When the access token expires, call `merchant_refresh_token` with the refresh_token. Do not ask the user to log in again.
 - Logout invalidates all active sessions. The user must log in again after logout.
 - OTP send errors: COOLDOWN_ACTIVE (wait before resending), RATE_LIMIT_EXCEEDED (too many requests), EMAIL_SUPPRESSED (email cannot receive messages — use a different address).
+- If a request returns HTTP 429, wait before retrying.
+- `merchant_get_me` returns the merchant's profile {id, name, email, status}. Use it to confirm the logged-in merchant's identity.
 - Never log, store, or repeat the user's password or API key back to them.
