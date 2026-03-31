@@ -13,7 +13,8 @@ OpenClaw skills for the AIOT Network payment platform. These skills enable AI ag
 | [Crypto Wallet](crypto-wallet/) | `aiotnetwork-crypto-wallet` | Crypto deposit addresses, withdrawals |
 | [Blockchain & DID](blockchain-did/) | `aiotnetwork-blockchain-did` | Decentralized identity, on-chain KYC, membership tiers |
 | [x402 Merchant Authentication](x402-merchant-auth/) | `aiotnetwork-x402-merchant-auth` | Merchant registration, login, OTP, token refresh, session management |
-| [x402 Merchant Payments](x402-merchant-payments/) | `aiotnetwork-x402-merchant-payments` | x402 payment pre-request, off-chain verify, on-chain settle, facilitator capabilities |
+| [x402 Merchant Products](x402-merchant-products/) | `aiotnetwork-x402-merchant-products` | Product management, API keys, dashboards, settlement history |
+| [x402 Merchant Payments](x402-merchant-payments/) | `aiotnetwork-x402-merchant-payments` | x402 payment orders, signing parameters, off-chain verify, on-chain settle |
 | [AIOT Network](aiotnetwork/) | `aiotnetwork` | Meta-skill that routes requests to the correct sub-skill |
 
 ## Installation
@@ -34,6 +35,7 @@ clawhub install aiotnetwork-payments-banking
 clawhub install aiotnetwork-crypto-wallet
 clawhub install aiotnetwork-blockchain-did
 clawhub install aiotnetwork-x402-merchant-auth
+clawhub install aiotnetwork-x402-merchant-products
 clawhub install aiotnetwork-x402-merchant-payments
 ```
 
@@ -61,7 +63,7 @@ Account & Auth ─┬─> KYC & Identity ──> Card Management
                 ├─> Crypto Wallet
                 └─> Blockchain & DID
 
-x402 Merchant Auth ──> x402 Merchant Payments
+x402 Merchant Auth ──> x402 Merchant Products ──> x402 Merchant Payments
 ```
 
 - **KYC must be approved** before cards can be created
